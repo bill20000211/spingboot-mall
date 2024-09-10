@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>產品資訊</title>
+</head>
+<body>
+
+<div>
+    <h1 id="productName"></h1>
+    <img id="productImage" src="" alt="產品圖片" width="200">
+    <p>類別: <span id="category"></span></p>
+    <p>價格: $<span id="price"></span></p>
+    <p>庫存: <span id="stock"></span> 件</p>
+    <p>描述: <span id="description"></span></p>
+    <p>建立日期: <span id="createdDate"></span></p>
+    <p>最後修改日期: <span id="lastModifiedDate"></span></p>
+</div>
+
+<script>
+    // 發送 GET 請求來獲取產品資料
+    fetch('http://localhost:8080/products/1')
+        .then(response => response.json()) // 解析 JSON
+        .then(data => {
+            // 將資料更新到頁面
+            document.getElementById('productName').textContent = data.productName;
+            document.getElementById('productImage').src = data.imageUrl;
+            document.getElementById('category').textContent = data.category;
+            document.getElementById('price').textContent = data.price;
+            document.getElementById('stock').textContent = data.stock;
+            document.getElementById('description').textContent = data.description;
+            document.getElementById('createdDate').textContent = new Date(data.createdDate).toLocaleString();
+            document.getElementById('lastModifiedDate').textContent = new Date(data.lastModifiedDate).toLocaleString();
+        })
+        .catch(error => {
+            console.error('Error fetching product data:', error);
+        });
+</script>
+
+</body>
+</html>

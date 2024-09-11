@@ -2,6 +2,7 @@ package com.bill.springbootmall.dao;
 
 import com.bill.springbootmall.constant.ProductCategory;
 import com.bill.springbootmall.dao.impl.ProductDao;
+import com.bill.springbootmall.dto.ProductQueryParams;
 import com.bill.springbootmall.dto.ProductRequest;
 import com.bill.springbootmall.model.Product;
 import com.bill.springbootmall.rowmapper.ProductRowMapper;
@@ -24,13 +25,15 @@ public class ProductDaoImpl implements ProductDao {
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Override
-    public List<Product> getProducts(ProductCategory category,
-                                     String search) {
+    public List<Product> getProducts(ProductQueryParams productQueryParams) {
         String sql = "SELECT product_id,product_name, category, image_url, price, stock, description, " +
                 "created_date, last_modified_date " +
                 "FROM product WHERE 1=1";
         // WHERE 1=1 是廢話，目的是卡住 WHERE
         Map<String, Object> map = new HashMap<>();
+
+        ProductCategory category = productQueryParams.getCategory();
+        String search = productQueryParams.getSearch();
 
         if (category != null) {
             // AND 前面一定要預留空白，不然會跟前面的 sql 黏在一起
@@ -97,8 +100,7 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     @Override
-    public void updateProduct(Integer productId,
-                              ProductRequest productRequest) {
+    public void updateProduct(Integer productId, ProductRequest productRequest) {
         String sql = "UPDATE product SET product_name = :productName, category = :category, " +
                 "image_url = :imageUrl, price = :price, stock = :stock, description = :description, " +
                 "last_modified_date = :lastModifiedDate WHERE product_id = :productId";

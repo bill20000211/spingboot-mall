@@ -1,6 +1,7 @@
 package com.bill.springbootmall.controller;
 
 import com.bill.springbootmall.constant.ProductCategory;
+import com.bill.springbootmall.dto.ProductQueryParams;
 import com.bill.springbootmall.dto.ProductRequest;
 import com.bill.springbootmall.model.Product;
 import com.bill.springbootmall.service.impl.ProductService;
@@ -19,12 +20,17 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/products")
-    public ResponseEntity<List<Product>>  getProducts(
+    public ResponseEntity<List<Product>> getProducts(
             // required 參數代表此參數可選可不選
             @RequestParam(required = false) ProductCategory category,
             @RequestParam(required = false) String search
     ) {
-        List<Product> productList = productService.getProducts(category, search);
+        // 當有大量的參數時，可以建立一個 Class 去存取參數
+        ProductQueryParams productQueryParams = new ProductQueryParams();
+        productQueryParams.setCategory(category);
+        productQueryParams.setSearch(search);
+
+        List<Product> productList = productService.getProducts(productQueryParams);
 
         return ResponseEntity.status(HttpStatus.OK).body(productList);
     }
@@ -51,7 +57,7 @@ public class ProductController {
 
     @PutMapping("/products/{productId}")
     public ResponseEntity<Product> updateProduct(@PathVariable Integer productId,
-                                                   @RequestBody @Valid ProductRequest productRequest) {
+                                                 @RequestBody @Valid ProductRequest productRequest) {
         if (productService.getProductById(productId) == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }else {

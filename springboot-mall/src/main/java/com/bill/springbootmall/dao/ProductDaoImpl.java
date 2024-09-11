@@ -1,5 +1,6 @@
 package com.bill.springbootmall.dao;
 
+import com.bill.springbootmall.constant.ProductCategory;
 import com.bill.springbootmall.dao.impl.ProductDao;
 import com.bill.springbootmall.dto.ProductRequest;
 import com.bill.springbootmall.model.Product;
@@ -23,11 +24,26 @@ public class ProductDaoImpl implements ProductDao {
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Override
-    public List<Product> getProducts() {
+    public List<Product> getProducts(ProductCategory category,
+                                     String search) {
         String sql = "SELECT product_id,product_name, category, image_url, price, stock, description, " +
                 "created_date, last_modified_date " +
-                "FROM product";
+                "FROM product WHERE 1=1";
+        // WHERE 1=1 是廢話，目的是卡住 WHERE
         Map<String, Object> map = new HashMap<>();
+
+        if (category != null) {
+            // AND 前面一定要預留空白，不然會跟前面的 sql 黏在一起
+            sql += " AND category = :category";
+            // 參數 category 是 ENUM 類型，所以要用.name()轉成字串
+            map.put("category", category.name());
+        }
+
+        if (search != null) {
+            sql += " AND product_name LIKE :search";
+            // % 一定要寫在 map 的值裡面，不能寫在 sql 裡面
+            map.put("search", "%" + search + "%");
+        }
 
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
 
@@ -61,7 +77,7 @@ public class ProductDaoImpl implements ProductDao {
 
         Map<String, Object> map = new HashMap<>();
         map.put("productName", productRequest.getProductName());
-        map.put("category", productRequest.getCategory().toString());
+        map.put("category", productRequest.getCategory().name());
         map.put("imageUrl", productRequest.getImageUrl());
         map.put("price", productRequest.getPrice());
         map.put("stock", productRequest.getStock());
@@ -81,7 +97,8 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     @Override
-    public void updateProduct(Integer productId, ProductRequest productRequest) {
+    public void updateProduct(Integer productId,
+                              ProductRequest productRequest) {
         String sql = "UPDATE product SET product_name = :productName, category = :category, " +
                 "image_url = :imageUrl, price = :price, stock = :stock, description = :description, " +
                 "last_modified_date = :lastModifiedDate WHERE product_id = :productId";
@@ -90,7 +107,7 @@ public class ProductDaoImpl implements ProductDao {
         map.put("productId", productId);
 
         map.put("productName", productRequest.getProductName());
-        map.put("category", productRequest.getCategory().toString());
+        map.put("category", productRequest.getCategory().name());
         map.put("imageUrl", productRequest.getImageUrl());
         map.put("price", productRequest.getPrice());
         map.put("stock", productRequest.getStock());

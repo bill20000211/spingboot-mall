@@ -12,6 +12,7 @@ public class Product {
     private Integer price;
     private Integer stock;
     private String description;
+    // Date 為英國格林威治標準時間
     private Date createdDate;
     private Date lastModifiedDate;
 

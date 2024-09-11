@@ -2,7 +2,7 @@ package com.bill.springbootmall.controller;
 
 import com.bill.springbootmall.dto.ProductRequest;
 import com.bill.springbootmall.model.Product;
-import com.bill.springbootmall.service.ProductService;
+import com.bill.springbootmall.service.impl.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,12 +40,20 @@ public class ProductController {
                                                    @RequestBody @Valid ProductRequest productRequest) {
         if (productService.getProductById(productId) == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }else{
+        }else {
             productService.updateProduct(productId, productRequest);
 
             Product product = productService.getProductById(productId);
 
             return ResponseEntity.status(HttpStatus.OK).body(product);
         }
+    }
+
+    @DeleteMapping("/products/{productId}")
+    public ResponseEntity<?> deleteProduct(@PathVariable Integer productId) {
+        // 前端只會在意這個商品有沒有被刪掉(不存在)，所以不用特別去判斷此商品是否存在
+        productService.deleteProductById(productId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

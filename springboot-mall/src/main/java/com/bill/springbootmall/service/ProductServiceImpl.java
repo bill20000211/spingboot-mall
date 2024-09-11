@@ -1,9 +1,9 @@
-package com.bill.springbootmall.service.impl;
+package com.bill.springbootmall.service;
 
 import com.bill.springbootmall.dao.impl.ProductDao;
 import com.bill.springbootmall.dto.ProductRequest;
 import com.bill.springbootmall.model.Product;
-import com.bill.springbootmall.service.ProductService;
+import com.bill.springbootmall.service.impl.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,5 +28,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void updateProduct(Integer productId, ProductRequest productRequest) {
         productDao.updateProduct(productId, productRequest);
+    }
+
+    @Override
+    public void deleteProductById(Integer productId) {
+        productDao.deleteProductById(productId);
     }
 }

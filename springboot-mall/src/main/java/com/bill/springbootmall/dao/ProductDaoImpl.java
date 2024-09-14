@@ -28,22 +28,9 @@ public class ProductDaoImpl implements ProductDao {
     public Integer countProducts(ProductQueryParams productQueryParams) {
         String sql = "SELECT count(*) FROM product WHERE 1=1";
         Map<String, Object> map = new HashMap<>();
-        ProductCategory  category = productQueryParams.getCategory();
-        String search = productQueryParams.getSearch();
 
         // 查詢條件
-        if (category != null) {
-            // AND 前面一定要預留空白，不然會跟前面的 sql 黏在一起
-            sql += " AND category = :category";
-            // 參數 category 是 ENUM 類型，所以要用.name()轉成字串
-            map.put("category", category.name());
-        }
-
-        if (search != null) {
-            sql += " AND product_name LIKE :search";
-            // % 一定要寫在 map 的值裡面，不能寫在 sql 裡面
-            map.put("search", "%" + search + "%");
-        }
+        sql = addFilteringSql(sql, map, productQueryParams);
 
         Integer total = namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class);
         return total;
@@ -57,34 +44,17 @@ public class ProductDaoImpl implements ProductDao {
         // WHERE 1=1 是廢話，目的是卡住 WHERE
         Map<String, Object> map = new HashMap<>();
 
-        ProductCategory category = productQueryParams.getCategory();
-        String search = productQueryParams.getSearch();
-        String orderBy = productQueryParams.getOrderBy();
-        String sort = productQueryParams.getSort();
-        Integer limit = productQueryParams.getLimit();
-        Integer offset = productQueryParams.getOffset();
-
         // 查詢條件
-        if (category != null) {
-            // AND 前面一定要預留空白，不然會跟前面的 sql 黏在一起
-            sql += " AND category = :category";
-            // 參數 category 是 ENUM 類型，所以要用.name()轉成字串
-            map.put("category", category.name());
-        }
-
-        if (search != null) {
-            sql += " AND product_name LIKE :search";
-            // % 一定要寫在 map 的值裡面，不能寫在 sql 裡面
-            map.put("search", "%" + search + "%");
-        }
+        sql = addFilteringSql(sql, map, productQueryParams);
 
         // 排序
-        sql += " ORDER BY " + orderBy + " " + sort; // 只能用字串拼接 orderBy
+        sql += " ORDER BY " + productQueryParams.getOrderBy() + " "
+                + productQueryParams.getSort(); // 只能用字串拼接 orderBy
 
         //分頁
         sql += " LIMIT :limit OFFSET :offset";
-        map.put("limit", limit);
-        map.put("offset", offset);
+        map.put("limit", productQueryParams.getLimit());
+        map.put("offset", productQueryParams.getOffset());
 
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
 
@@ -167,5 +137,25 @@ public class ProductDaoImpl implements ProductDao {
         map.put("productId", productId);
 
         namedParameterJdbcTemplate.update(sql, map);
+    }
+
+    // 程式提煉 // 只有在這個 class 用得到這個方法，所以設 private
+    private String addFilteringSql(String sql,
+                                   Map<String, Object> map,
+                                   ProductQueryParams productQueryParams) {
+        // 查詢條件
+        if (productQueryParams.getCategory() != null) {
+            // AND 前面一定要預留空白，不然會跟前面的 sql 黏在一起
+            sql += " AND category = :category";
+            // 參數 category 是 ENUM 類型，所以要用.name()轉成字串
+            map.put("category", productQueryParams.getCategory().name());
+        }
+
+        if (productQueryParams.getSearch() != null) {
+            sql += " AND product_name LIKE :search";
+            // % 一定要寫在 map 的值裡面，不能寫在 sql 裡面
+            map.put("search", "%" + productQueryParams.getSearch() + "%");
+        }
+        return sql;
     }
 }

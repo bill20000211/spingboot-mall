@@ -36,21 +36,29 @@ public class ProductDaoImpl implements ProductDao {
         String search = productQueryParams.getSearch();
         String orderBy = productQueryParams.getOrderBy();
         String sort = productQueryParams.getSort();
+        Integer limit = productQueryParams.getLimit();
+        Integer offset = productQueryParams.getOffset();
 
+        // 查詢條件
         if (category != null) {
             // AND 前面一定要預留空白，不然會跟前面的 sql 黏在一起
             sql += " AND category = :category";
             // 參數 category 是 ENUM 類型，所以要用.name()轉成字串
             map.put("category", category.name());
         }
-
         if (search != null) {
             sql += " AND product_name LIKE :search";
             // % 一定要寫在 map 的值裡面，不能寫在 sql 裡面
             map.put("search", "%" + search + "%");
         }
 
-        sql += " ORDER BY " + orderBy + " " + sort;
+        // 排序
+        sql += " ORDER BY " + orderBy + " " + sort; // 只能用字串拼接 orderBy
+
+        //分頁
+        sql += " LIMIT :limit OFFSET :offset";
+        map.put("limit", limit);
+        map.put("offset", offset);
 
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
 

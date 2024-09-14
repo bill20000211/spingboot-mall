@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Product</title>
+</head>
+<body>
+<h1>Update Product</h1>
+<form id="update-product-form">
+    <input type="text" id="name" placeholder="Product Name" required />
+    <input type="text" id="category" placeholder="Product Category" required />
+    <input type="text" id="description" placeholder="Product Description" required />
+    <button type="submit">Update</button>
+</form>
+
+<script src="script.js"></script>
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const productId = params.get('id');
+    fetchProductToUpdate(productId);
+
+    document.getElementById("update-product-form").addEventListener("submit", function(event) {
+        event.preventDefault();
+        updateProduct(productId);
+    });
+</script>
+</body>
+</html>

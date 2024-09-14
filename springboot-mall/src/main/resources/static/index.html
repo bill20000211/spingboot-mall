@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Details</title>
+    <title>Product List</title>
 </head>
 <body>
-<h1>Product Details</h1>
-<div id="product-detail"></div>
+<h1>Product List</h1>
+<div id="product-list"></div>
 
 <script src="script.js"></script>
 <script>
-    const params = new URLSearchParams(window.location.search);
-    const productId = params.get('id');
-    fetchProduct(productId);
+    document.addEventListener("DOMContentLoaded", function() {
+        fetchProducts();
+    });
 </script>
 </body>
 </html>

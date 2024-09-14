@@ -34,6 +34,8 @@ public class ProductDaoImpl implements ProductDao {
 
         ProductCategory category = productQueryParams.getCategory();
         String search = productQueryParams.getSearch();
+        String orderBy = productQueryParams.getOrderBy();
+        String sort = productQueryParams.getSort();
 
         if (category != null) {
             // AND 前面一定要預留空白，不然會跟前面的 sql 黏在一起
@@ -47,6 +49,8 @@ public class ProductDaoImpl implements ProductDao {
             // % 一定要寫在 map 的值裡面，不能寫在 sql 裡面
             map.put("search", "%" + search + "%");
         }
+
+        sql += " ORDER BY " + orderBy + " " + sort;
 
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
 

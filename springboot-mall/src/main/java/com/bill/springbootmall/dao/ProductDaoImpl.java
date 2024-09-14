@@ -25,6 +25,31 @@ public class ProductDaoImpl implements ProductDao {
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Override
+    public Integer countProducts(ProductQueryParams productQueryParams) {
+        String sql = "SELECT count(*) FROM product WHERE 1=1";
+        Map<String, Object> map = new HashMap<>();
+        ProductCategory  category = productQueryParams.getCategory();
+        String search = productQueryParams.getSearch();
+
+        // 查詢條件
+        if (category != null) {
+            // AND 前面一定要預留空白，不然會跟前面的 sql 黏在一起
+            sql += " AND category = :category";
+            // 參數 category 是 ENUM 類型，所以要用.name()轉成字串
+            map.put("category", category.name());
+        }
+
+        if (search != null) {
+            sql += " AND product_name LIKE :search";
+            // % 一定要寫在 map 的值裡面，不能寫在 sql 裡面
+            map.put("search", "%" + search + "%");
+        }
+
+        Integer total = namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class);
+        return total;
+    }
+
+    @Override
     public List<Product> getProducts(ProductQueryParams productQueryParams) {
         String sql = "SELECT product_id,product_name, category, image_url, price, stock, description, " +
                 "created_date, last_modified_date " +
@@ -46,6 +71,7 @@ public class ProductDaoImpl implements ProductDao {
             // 參數 category 是 ENUM 類型，所以要用.name()轉成字串
             map.put("category", category.name());
         }
+
         if (search != null) {
             sql += " AND product_name LIKE :search";
             // % 一定要寫在 map 的值裡面，不能寫在 sql 裡面

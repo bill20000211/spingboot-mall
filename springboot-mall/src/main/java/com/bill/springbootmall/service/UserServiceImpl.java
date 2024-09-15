@@ -1,6 +1,7 @@
 package com.bill.springbootmall.service;
 
 import com.bill.springbootmall.dao.impl.UserDao;
+import com.bill.springbootmall.dto.UserLoginRequest;
 import com.bill.springbootmall.dto.UserRegisterRequest;
 import com.bill.springbootmall.model.User;
 import com.bill.springbootmall.service.impl.UserService;
@@ -39,5 +40,21 @@ public class UserServiceImpl implements UserService {
 
         // 創建帳號
         return userDao.createUser(userRegisterRequest);
+    }
+
+    @Override
+    public User login(UserLoginRequest userLoginRequest) {
+        User user = userDao.getUserByEmail(userLoginRequest.getEmail());
+        if (user == null) {
+            log.warn("此 Email {} 尚未註冊", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        // Java 比較字串一定要用 equals (記憶體位置)
+        if (!user.getPassword().equals(userLoginRequest.getPassword())) {
+            log.warn("Email {} 的密碼不正確", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }else {
+            return user;
+        }
     }
 }

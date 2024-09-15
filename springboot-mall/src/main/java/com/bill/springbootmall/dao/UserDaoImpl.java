@@ -1,6 +1,7 @@
 package com.bill.springbootmall.dao;
 
 import com.bill.springbootmall.dao.impl.UserDao;
+import com.bill.springbootmall.dto.UserLoginRequest;
 import com.bill.springbootmall.dto.UserRegisterRequest;
 import com.bill.springbootmall.model.User;
 import com.bill.springbootmall.rowmapper.UserRowMapper;

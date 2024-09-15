@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Validated // 因為有用@Min()和@Max()
+@Validated // 因為有用 @Min() 和 @Max()
 @RestController
 public class ProductController {
 
@@ -45,8 +45,8 @@ public class ProductController {
         productQueryParams.setSearch(search);
         productQueryParams.setOrderBy(orderBy);
         productQueryParams.setSort(sort);
-        Integer offset = (page - 1) * limit;
         productQueryParams.setLimit(limit);
+        Integer offset = (page - 1) * limit;
         productQueryParams.setOffset(offset);
 
         // 取得 Product list

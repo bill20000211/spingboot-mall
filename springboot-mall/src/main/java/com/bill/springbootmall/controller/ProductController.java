@@ -35,8 +35,9 @@ public class ProductController {
             @RequestParam(defaultValue = "desc") String sort,
 
             // 分頁 Pagination，用Min限制前端傳遞的大小，用Min防止傳遞負數
-            @RequestParam(defaultValue = "5") @Max(100) @Min(0) Integer limit,
-            @RequestParam(defaultValue = "0") @Min(0) Integer offset
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "5") @Max(100) @Min(0) Integer limit
+            // @RequestParam(defaultValue = "0") @Min(0) Integer offset
     ) {
         // 當有大量的參數時，可以建立一個 Class 去存取參數
         ProductQueryParams productQueryParams = new ProductQueryParams();
@@ -44,8 +45,10 @@ public class ProductController {
         productQueryParams.setSearch(search);
         productQueryParams.setOrderBy(orderBy);
         productQueryParams.setSort(sort);
+        Integer offset = (page - 1) * limit;
         productQueryParams.setLimit(limit);
         productQueryParams.setOffset(offset);
+
         // 取得 Product list
         List<Product> productList = productService.getProducts(productQueryParams);
 
@@ -53,13 +56,13 @@ public class ProductController {
         Integer total = productService.countProducts(productQueryParams);
 
         // 分頁
-        Page<Product> page = new Page<>();
-        page.setLimit(limit);
-        page.setOffset(offset);
-        page.setTotal(total);
-        page.setResults(productList);
+        Page<Product> pageInfo = new Page<>();
+        pageInfo.setLimit(limit);
+        pageInfo.setOffset(offset);
+        pageInfo.setTotal(total);
+        pageInfo.setResults(productList);
 
-        return ResponseEntity.status(HttpStatus.OK).body(page);
+        return ResponseEntity.status(HttpStatus.OK).body(pageInfo);
     }
 
     @GetMapping("/products/{productId}")

@@ -1,4 +1,4 @@
-package com.bill.springbootmall.service.impl;
+package com.bill.springbootmall.service;
 
 import com.bill.springbootmall.dto.UserLoginRequest;
 import com.bill.springbootmall.dto.UserRegisterRequest;

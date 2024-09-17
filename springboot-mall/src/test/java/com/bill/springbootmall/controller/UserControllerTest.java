@@ -1,6 +1,6 @@
 package com.bill.springbootmall.controller;
 
-import com.bill.springbootmall.dao.impl.UserDao;
+import com.bill.springbootmall.dao.UserDao;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.bill.springbootmall.dto.UserLoginRequest;
 import com.bill.springbootmall.dto.UserRegisterRequest;

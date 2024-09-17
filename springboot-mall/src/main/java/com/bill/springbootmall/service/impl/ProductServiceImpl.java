@@ -1,11 +1,10 @@
-package com.bill.springbootmall.service;
+package com.bill.springbootmall.service.impl;
 
-import com.bill.springbootmall.constant.ProductCategory;
-import com.bill.springbootmall.dao.impl.ProductDao;
+import com.bill.springbootmall.dao.ProductDao;
 import com.bill.springbootmall.dto.ProductQueryParams;
 import com.bill.springbootmall.dto.ProductRequest;
 import com.bill.springbootmall.model.Product;
-import com.bill.springbootmall.service.impl.ProductService;
+import com.bill.springbootmall.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -1,10 +1,10 @@
-package com.bill.springbootmall.service;
+package com.bill.springbootmall.service.impl;
 
-import com.bill.springbootmall.dao.impl.UserDao;
+import com.bill.springbootmall.dao.UserDao;
 import com.bill.springbootmall.dto.UserLoginRequest;
 import com.bill.springbootmall.dto.UserRegisterRequest;
 import com.bill.springbootmall.model.User;
-import com.bill.springbootmall.service.impl.UserService;
+import com.bill.springbootmall.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

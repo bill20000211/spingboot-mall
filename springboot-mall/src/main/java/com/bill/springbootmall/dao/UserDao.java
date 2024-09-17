@@ -1,4 +1,4 @@
-package com.bill.springbootmall.dao.impl;
+package com.bill.springbootmall.dao;
 
 import com.bill.springbootmall.dto.UserRegisterRequest;
 import com.bill.springbootmall.model.User;

@@ -4,7 +4,7 @@ import com.bill.springbootmall.constant.ProductCategory;
 import com.bill.springbootmall.dto.ProductQueryParams;
 import com.bill.springbootmall.dto.ProductRequest;
 import com.bill.springbootmall.model.Product;
-import com.bill.springbootmall.service.impl.ProductService;
+import com.bill.springbootmall.service.ProductService;
 import com.bill.springbootmall.util.Page;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;

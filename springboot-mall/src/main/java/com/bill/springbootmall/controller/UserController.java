@@ -3,7 +3,7 @@ package com.bill.springbootmall.controller;
 import com.bill.springbootmall.dto.UserLoginRequest;
 import com.bill.springbootmall.dto.UserRegisterRequest;
 import com.bill.springbootmall.model.User;
-import com.bill.springbootmall.service.impl.UserService;
+import com.bill.springbootmall.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

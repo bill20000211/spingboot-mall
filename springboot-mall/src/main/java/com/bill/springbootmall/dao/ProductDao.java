@@ -1,13 +1,12 @@
-package com.bill.springbootmall.service.impl;
+package com.bill.springbootmall.dao;
 
-import com.bill.springbootmall.constant.ProductCategory;
 import com.bill.springbootmall.dto.ProductQueryParams;
 import com.bill.springbootmall.dto.ProductRequest;
 import com.bill.springbootmall.model.Product;
 
 import java.util.List;
 
-public interface ProductService {
+public interface ProductDao {
 
     List<Product> getProducts(ProductQueryParams productQueryParams);
 
@@ -15,7 +14,7 @@ public interface ProductService {
 
     Integer createProduct(ProductRequest productRequest);
 
-    void updateProduct(Integer productId , ProductRequest productRequest);
+    void updateProduct(Integer productId, ProductRequest productRequest);
 
     void deleteProductById(Integer productId);
 

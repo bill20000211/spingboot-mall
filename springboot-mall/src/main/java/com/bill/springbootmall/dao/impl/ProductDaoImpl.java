@@ -1,7 +1,6 @@
-package com.bill.springbootmall.dao;
+package com.bill.springbootmall.dao.impl;
 
-import com.bill.springbootmall.constant.ProductCategory;
-import com.bill.springbootmall.dao.impl.ProductDao;
+import com.bill.springbootmall.dao.ProductDao;
 import com.bill.springbootmall.dto.ProductQueryParams;
 import com.bill.springbootmall.dto.ProductRequest;
 import com.bill.springbootmall.model.Product;

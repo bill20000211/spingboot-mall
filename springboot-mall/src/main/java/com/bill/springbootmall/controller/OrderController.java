@@ -1,6 +1,7 @@
 package com.bill.springbootmall.controller;
 
 import com.bill.springbootmall.dto.CreateOrderRequest;
+import com.bill.springbootmall.model.Order;
 import com.bill.springbootmall.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +22,13 @@ public class OrderController {
 
     // 訂單是帳號的附屬功能，在所有帳號中 ID 為 userId 的帳號中創建訂單
     @PostMapping("/users/{userId}/orders")
-    public ResponseEntity<?> createOrder(@PathVariable Integer userId,
+    public ResponseEntity<Order> createOrder(@PathVariable Integer userId,
                                          @RequestBody @Valid CreateOrderRequest createOrderRequest) {
 
         Integer orderId = orderService.createOrder(userId, createOrderRequest);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderId);
+        Order order = orderService.getOrderById(orderId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }
 }

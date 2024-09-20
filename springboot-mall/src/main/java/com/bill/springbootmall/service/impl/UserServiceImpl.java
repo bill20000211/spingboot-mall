@@ -10,9 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.server.ResponseStatusException;
@@ -59,35 +59,63 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String login(UserLoginRequest userLoginRequest) {
-        User user = userDao.getUserByEmail(userLoginRequest.getEmail());
+//        User user = userDao.getUserByEmail(userLoginRequest.getEmail());
 
         // 檢查 user 是否存在
-        if (user == null) {
-            log.warn("此 Email {} 尚未註冊", userLoginRequest.getEmail());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+//        if (user == null) {
+//            log.warn("此 Email {} 尚未註冊", userLoginRequest.getEmail());
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+//        }
 
         // 使用 MD5 生成密碼砸湊值
-        String hashedPassword = DigestUtils.md5DigestAsHex(userLoginRequest.getPassword().getBytes());
+//        String hashedPassword = DigestUtils.md5DigestAsHex(userLoginRequest.getPassword().getBytes());
 
         // 比較密碼
         // Java 比較字串一定要用 equals (記憶體位置)
-        if (!user.getPassword().equals(hashedPassword)) {
-            log.warn("Email {} 的密碼不正確", userLoginRequest.getEmail());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+//        if (!user.getPassword().equals(hashedPassword)) {
+//            log.warn("Email {} 的密碼不正確", userLoginRequest.getEmail());
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+//        }
+
+        try {
+            // 使用 AuthenticationManager 進行身份驗證
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    userLoginRequest.getEmail(), userLoginRequest.getPassword());
+
+            // 認證過程將使用 UserDetailsService 加載用戶信息，並使用配置的密碼編碼器進行密碼驗證
+            authentication = authenticationManager.authenticate(authentication);
+
+            // 認證成功後生成 JWT token
+            String token = jwtUtil.createToken(authentication);
+
+            // 返回 JWT token
+            return token;
+
+        } catch (BadCredentialsException e) {
+            // 密碼不正確
+            log.warn("密碼不正確: {}", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "密碼不正確");
+
+        } catch (UsernameNotFoundException e) {
+            // 用戶名不存在
+            log.warn("此 Email {} 尚未註冊", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "此 Email 尚未註冊");
+
+        } catch (LockedException e) {
+            // 帳戶被鎖定
+            log.warn("帳戶被鎖定: {}", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "帳戶已被鎖定");
+
+        } catch (DisabledException e) {
+            // 帳戶被禁用
+            log.warn("帳戶已被禁用: {}", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "帳戶已被禁用");
+
+        } catch (Exception e) {
+            // 捕捉其他未預期的異常
+            log.error("登入失敗: {}", userLoginRequest.getEmail(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "登入失敗，請稍後再試");
         }
 
-        // 使用 AuthenticationManager 進行身份驗證
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                userLoginRequest.getEmail(), userLoginRequest.getPassword());
-        authentication = authenticationManager.authenticate(authentication);
-
-        // 認證成功後生成 JWT token
-        String token = jwtUtil.createToken(authentication);
-
-        System.out.println();
-
-        // 返回 JWT token
-        return token;
     }
 }

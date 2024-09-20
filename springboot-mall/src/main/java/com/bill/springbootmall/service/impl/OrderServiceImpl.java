@@ -85,7 +85,8 @@ public class OrderServiceImpl implements OrderService {
 
             // product 是否存在、庫存是否足夠
             if (product == null) {
-                log.warn("商品 {} 不存在", buyItem.getProductId());
+                log.warn("商品 {} 不存在",
+                        buyItem.getProductId());
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             } else if (product.getStock() < buyItem.getQuantity()) {
                 log.warn("商品 {} 的庫存不足，無法購買。剩餘庫存 {}",
@@ -101,7 +102,7 @@ public class OrderServiceImpl implements OrderService {
             int amount = product.getPrice() * buyItem.getQuantity();
             totalAmount += amount;
 
-            // 轉換 BuyItem to OrderItem
+            // 轉換 BuyItem(前端傳遞的參數) to OrderItem(實際所需的欄位)
             OrderItem orderItem = new OrderItem();
             orderItem.setProductId(productId);
             orderItem.setQuantity(buyItem.getQuantity());

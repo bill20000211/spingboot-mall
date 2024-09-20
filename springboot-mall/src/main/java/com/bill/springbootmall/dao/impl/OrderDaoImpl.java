@@ -24,6 +24,7 @@ public class OrderDaoImpl implements OrderDao {
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+    // 計算總 Order 筆數（用於計算頁數）
     @Override
     public Integer countOrder(OrderQueryParams orderQueryParams) {
         String sql = "SELECT count(*) FROM `order` WHERE 1=1";
@@ -37,6 +38,7 @@ public class OrderDaoImpl implements OrderDao {
         return count;
     }
 
+    // 取得特定 User 底下的所有訂單
     @Override
     public List<Order> getOrders(OrderQueryParams orderQueryParams) {
         String sql = "SELECT order_id, user_id, total_amount ,created_date, last_modified_date FROM `order` WHERE 1=1";
@@ -59,6 +61,7 @@ public class OrderDaoImpl implements OrderDao {
         return orderList;
     }
 
+    // 在創建完訂單後，根據 OrderId 獲取該 Order，並回傳給前端
     @Override
     public Order getOrderById(Integer orderId) {
         String sql = "SELECT order_id, user_id, total_amount, created_date ,last_modified_date " +
@@ -75,6 +78,7 @@ public class OrderDaoImpl implements OrderDao {
         }
     }
 
+    // 獲取該 OrderId 的所有 OrderItem
     @Override
     public List<OrderItem> getOrderItemsByOrderId(Integer orderId) {
         String sql = "SELECT oi.order_item_id, oi.order_id, oi.product_id, oi.quantity, oi.amount, p.product_name, p.image_url " +
@@ -90,6 +94,7 @@ public class OrderDaoImpl implements OrderDao {
         return orderItemList;
     }
 
+    // 創建 Order，並得到 OrderId（用於創建個別的OrderItem）
     @Override
     public Integer createOrder(Integer userId, Integer totalAmount) {
         String sql = "INSERT INTO `order`(user_id, total_amount, created_date, last_modified_date)" +
@@ -112,6 +117,7 @@ public class OrderDaoImpl implements OrderDao {
         return orderId;
     }
 
+    // 根據前面 createOrder 所獲得的 OrderId 進行創建個別的 OrderItem
     @Override
     public void createOrderItems(Integer orderId, List<OrderItem> orderItemList) {
 
@@ -150,6 +156,7 @@ public class OrderDaoImpl implements OrderDao {
         namedParameterJdbcTemplate.batchUpdate(sql, parameterSources);
     }
 
+    // 提煉程式
     private String addFilteringSql(String sql,
                                    Map<String, Object> map,
                                    OrderQueryParams orderQueryParams) {

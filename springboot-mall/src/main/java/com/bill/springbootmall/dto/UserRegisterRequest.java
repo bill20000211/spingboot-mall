@@ -13,6 +13,9 @@ public class UserRegisterRequest {
     @NotBlank
     private String password;
 
+    @NotBlank
+    private String authority;
+
     public String getEmail() {
         return email;
     }
@@ -27,5 +30,13 @@ public class UserRegisterRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getAuthority() {
+        return authority;
+    }
+
+    public void setAuthority(@NotBlank String authority) {
+        this.authority = authority;
     }
 }

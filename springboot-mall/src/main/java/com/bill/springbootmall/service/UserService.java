@@ -10,5 +10,5 @@ public interface UserService {
 
     Integer register(UserRegisterRequest userRegisterRequest);
 
-    User login(UserLoginRequest userLoginRequest);
+    String login(UserLoginRequest userLoginRequest);
 }

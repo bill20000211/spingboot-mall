@@ -5,10 +5,14 @@ import com.bill.springbootmall.dto.UserLoginRequest;
 import com.bill.springbootmall.dto.UserRegisterRequest;
 import com.bill.springbootmall.model.User;
 import com.bill.springbootmall.service.UserService;
+import com.bill.springbootmall.util.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,6 +22,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtUtil jwtUtil;  // 假設你有一個 JwtUtil 來生成 JWT token
 
     private final static Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
@@ -48,7 +58,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User login(UserLoginRequest userLoginRequest) {
+    public String login(UserLoginRequest userLoginRequest) {
         User user = userDao.getUserByEmail(userLoginRequest.getEmail());
 
         // 檢查 user 是否存在
@@ -65,8 +75,19 @@ public class UserServiceImpl implements UserService {
         if (!user.getPassword().equals(hashedPassword)) {
             log.warn("Email {} 的密碼不正確", userLoginRequest.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }else {
-            return user;
         }
+
+        // 使用 AuthenticationManager 進行身份驗證
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                userLoginRequest.getEmail(), userLoginRequest.getPassword());
+        authentication = authenticationManager.authenticate(authentication);
+
+        // 認證成功後生成 JWT token
+        String token = jwtUtil.createToken(authentication);
+
+        System.out.println();
+
+        // 返回 JWT token
+        return token;
     }
 }

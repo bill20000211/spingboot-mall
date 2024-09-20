@@ -14,6 +14,8 @@ public class User {
     @JsonIgnore
     private String password;
 
+    private String authority;
+
     private Date createdDate;
     private Date lastModifiedDate;
 
@@ -39,6 +41,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getAuthority() {
+        return authority;
+    }
+
+    public void setAuthority(String authority) {
+        this.authority = authority;
     }
 
     public Date getCreatedDate() {

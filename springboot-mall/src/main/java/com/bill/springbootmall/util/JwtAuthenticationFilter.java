@@ -9,12 +9,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -34,15 +36,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String accessToken = authHeader.replace("Bearer ", "");
             String username = JwtUtil.getEmailFromToken(accessToken);
 
+            // 從 Token 中解析角色
+            List<GrantedAuthority> authorities = JwtUtil.getAuthoritiesFromToken(accessToken);
             MyUserDetails myUserDetails = myUserDetailService.loadUserByUsername(username);
             Authentication authentication =
                     new UsernamePasswordAuthenticationToken(
-                            username, myUserDetails.getPassword(), myUserDetails.getAuthorities());
-            SecurityContextHolder.getContext()
-                    .setAuthentication(authentication);
-        }
+                            myUserDetails, null, authorities);
 
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
         filterChain.doFilter(request, response);
     }
-
 }

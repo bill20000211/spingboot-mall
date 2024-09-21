@@ -59,13 +59,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String login(UserLoginRequest userLoginRequest) {
-//        User user = userDao.getUserByEmail(userLoginRequest.getEmail());
+        User user = userDao.getUserByEmail(userLoginRequest.getEmail());
 
-        // 檢查 user 是否存在
-//        if (user == null) {
-//            log.warn("此 Email {} 尚未註冊", userLoginRequest.getEmail());
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-//        }
+        // 檢查 user 是否存在（吃不到 UsernameNotFoundException e）
+        if (user == null) {
+            log.warn("此 Email {} 尚未註冊", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
 
         // 使用 MD5 生成密碼砸湊值
 //        String hashedPassword = DigestUtils.md5DigestAsHex(userLoginRequest.getPassword().getBytes());
@@ -91,25 +91,17 @@ public class UserServiceImpl implements UserService {
             // 返回 JWT token
             return token;
 
-        } catch (BadCredentialsException e) {
-            // 密碼不正確
+        }
+//        catch (UsernameNotFoundException e) {
+//            // 用戶名不存在，捕獲該異常並返回錯誤
+//            log.warn("此 Email {} 尚未註冊", userLoginRequest.getEmail());
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "此 Email 尚未註冊");
+//
+//        }
+        catch (BadCredentialsException e) {
+            // 密碼不正確，捕獲該異常
             log.warn("密碼不正確: {}", userLoginRequest.getEmail());
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "密碼不正確");
-
-        } catch (UsernameNotFoundException e) {
-            // 用戶名不存在
-            log.warn("此 Email {} 尚未註冊", userLoginRequest.getEmail());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "此 Email 尚未註冊");
-
-        } catch (LockedException e) {
-            // 帳戶被鎖定
-            log.warn("帳戶被鎖定: {}", userLoginRequest.getEmail());
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "帳戶已被鎖定");
-
-        } catch (DisabledException e) {
-            // 帳戶被禁用
-            log.warn("帳戶已被禁用: {}", userLoginRequest.getEmail());
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "帳戶已被禁用");
 
         } catch (Exception e) {
             // 捕捉其他未預期的異常

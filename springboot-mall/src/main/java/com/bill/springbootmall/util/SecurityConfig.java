@@ -29,7 +29,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/products/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/products").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/products/*").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/products/*").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/users/**").permitAll()
                         .anyRequest().authenticated()  // 其他所有請求都需要身份驗證
                 )

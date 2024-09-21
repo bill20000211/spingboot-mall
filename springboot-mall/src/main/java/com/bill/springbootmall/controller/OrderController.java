@@ -2,6 +2,7 @@ package com.bill.springbootmall.controller;
 
 import com.bill.springbootmall.dto.CreateOrderRequest;
 import com.bill.springbootmall.dto.OrderQueryParams;
+import com.bill.springbootmall.model.MyUserDetails;
 import com.bill.springbootmall.model.Order;
 import com.bill.springbootmall.service.OrderService;
 import com.bill.springbootmall.util.JwtUtil;
@@ -17,11 +18,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collection;
 import java.util.List;
 
 
@@ -32,18 +36,23 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    private final static Logger log = LoggerFactory.getLogger(OrderController.class);
+    @Autowired
+    private JwtUtil jwtUtil;
 
-    private static final String HEADER_AUTH = "Authorization";
+    private final static Logger log = LoggerFactory.getLogger(OrderController.class);
 
     @GetMapping("/users/orders")
     public ResponseEntity<Page<Order>> getOrders(
             //@PathVariable Integer userId,
             @RequestParam(defaultValue = "10") @Max(100) @Min(0) Integer limit,
-            @RequestParam(defaultValue = "0") @Min(0) Integer offset,
-            HttpServletRequest request
+            @RequestParam(defaultValue = "0") @Min(0) Integer offset
     ){
-        Integer userId = getUserIdFromToken(request);
+        Integer userId = jwtUtil.getUserIdFromToken();
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         OrderQueryParams orderQueryParams = new OrderQueryParams();
         orderQueryParams.setUserId(userId);
         orderQueryParams.setLimit(limit);
@@ -69,30 +78,17 @@ public class OrderController {
     // 訂單是帳號的附屬功能，在所有帳號中 ID 為 userId 的帳號中創建訂單
     @PostMapping("/users/orders")
     public ResponseEntity<Order> createOrder(// @PathVariable Integer userId,
-                                             @RequestBody @Valid CreateOrderRequest createOrderRequest,
-                                             HttpServletRequest request) {
-        Integer userId = getUserIdFromToken(request);
+                                             @RequestBody @Valid CreateOrderRequest createOrderRequest) {
+        Integer userId = jwtUtil.getUserIdFromToken();
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         Integer orderId = orderService.createOrder(userId, createOrderRequest);
 
         Order order = orderService.getOrderById(orderId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(order);
-    }
-
-    // 從 Token 提取 userId
-    private Integer getUserIdFromToken(HttpServletRequest request) {
-        String authHeader = request.getHeader(HEADER_AUTH);
-        log.info("Authorization Header: " + authHeader);
-
-        if (ObjectUtils.isEmpty(authHeader)) {
-            log.warn("UNAUTHORIZED");
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-        }
-
-        String accessToken = authHeader.replace("Bearer ", "");
-        Integer userId = JwtUtil.getUserIdFromToken(accessToken);
-
-        return userId;
     }
 }

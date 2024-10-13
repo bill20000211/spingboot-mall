@@ -2,30 +2,21 @@ package com.bill.springbootmall.controller;
 
 import com.bill.springbootmall.dto.CreateOrderRequest;
 import com.bill.springbootmall.dto.OrderQueryParams;
-import com.bill.springbootmall.model.MyUserDetails;
 import com.bill.springbootmall.model.Order;
 import com.bill.springbootmall.service.OrderService;
 import com.bill.springbootmall.util.JwtUtil;
 import com.bill.springbootmall.util.Page;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Collection;
 import java.util.List;
 
 
@@ -47,12 +38,14 @@ public class OrderController {
             @RequestParam(defaultValue = "10") @Max(100) @Min(0) Integer limit,
             @RequestParam(defaultValue = "0") @Min(0) Integer offset
     ){
+        // 從 Token 解析出 userId
         Integer userId = jwtUtil.getUserIdFromToken();
 
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        // 前端傳遞之參數
         OrderQueryParams orderQueryParams = new OrderQueryParams();
         orderQueryParams.setUserId(userId);
         orderQueryParams.setLimit(limit);
@@ -79,6 +72,7 @@ public class OrderController {
     @PostMapping("/users/orders")
     public ResponseEntity<Order> createOrder(// @PathVariable Integer userId,
                                              @RequestBody @Valid CreateOrderRequest createOrderRequest) {
+        // 從 Token 解析出 userId
         Integer userId = jwtUtil.getUserIdFromToken();
 
         if (userId == null) {

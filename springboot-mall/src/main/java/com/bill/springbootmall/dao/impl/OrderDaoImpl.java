@@ -140,6 +140,7 @@ public class OrderDaoImpl implements OrderDao {
         String sql = "INSERT INTO order_item(order_id, product_id,quantity, amount)" +
                     " VALUES (:orderId, :productId, :quantity, :amount)";
 
+        // parameterSources 是 batchUpdate 所用到的結構
         MapSqlParameterSource[] parameterSources = new MapSqlParameterSource[orderItemList.size()];
 
         for (int i = 0; i < orderItemList.size(); i++) {
@@ -167,5 +168,22 @@ public class OrderDaoImpl implements OrderDao {
             map.put("userId", orderQueryParams.getUserId());
         }
         return sql;
+    }
+
+    @Override
+    public Integer getUserIdByOrderId(Integer orderId) {
+        String sql = "SELECT order_id, user_id, total_amount, created_date ,last_modified_date " +
+                "FROM `order` WHERE `order_id` = :orderId";
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("orderId", orderId);
+
+        List<Order> orderList = namedParameterJdbcTemplate.query(sql, map, new OrderRowMapper());
+
+        if (orderList != null && orderList.size() > 0) {
+            return orderList.get(0).getUserId();
+        } else {
+            return null;
+        }
     }
 }

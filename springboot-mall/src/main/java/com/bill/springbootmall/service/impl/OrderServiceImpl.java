@@ -77,8 +77,8 @@ public class OrderServiceImpl implements OrderService {
 
         int totalAmount = 0;
         List<OrderItem> orderItemList = new ArrayList<>();
-        List<BuyItem> buyItemList = createOrderRequest.getBuyItemList();
 
+        List<BuyItem> buyItemList = createOrderRequest.getBuyItemList();
         // python 的 for(buyItem in buyItems):
         for (BuyItem buyItem : buyItemList) {
             Product product = productDao.getProductById(buyItem.getProductId());
@@ -94,9 +94,8 @@ public class OrderServiceImpl implements OrderService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             }
 
-            Integer productId = product.getProductId();
             // 扣除商品庫存
-            productDao.updateStock(productId, product.getStock() - buyItem.getQuantity());
+            productDao.updateStock(buyItem.getProductId(), product.getStock() - buyItem.getQuantity());
 
             // 計算金額
             int amount = product.getPrice() * buyItem.getQuantity();
@@ -104,18 +103,25 @@ public class OrderServiceImpl implements OrderService {
 
             // 轉換 BuyItem(前端傳遞的參數) to OrderItem(實際所需的欄位)
             OrderItem orderItem = new OrderItem();
-            orderItem.setProductId(productId);
+            orderItem.setProductId(buyItem.getProductId());
             orderItem.setQuantity(buyItem.getQuantity());
             orderItem.setAmount(amount);
 
             orderItemList.add(orderItem);
         }
 
-        // 創建訂單
+        // 創建訂單（會同時，因為有用 @Transactional）
         Integer orderId = orderDao.createOrder(userId, totalAmount);
 
         orderDao.createOrderItems(orderId, orderItemList);
 
         return orderId;
+    }
+
+    @Override
+    public Integer getUserIdByOrderId(Integer orderId) {
+        Integer userId = orderDao.getUserIdByOrderId(orderId);
+
+        return userId;
     }
 }

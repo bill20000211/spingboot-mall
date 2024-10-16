@@ -36,8 +36,7 @@ public class OrderController {
     public ResponseEntity<Page<Order>> getOrders(
             //@PathVariable Integer userId,
             @RequestParam(defaultValue = "10") @Max(100) @Min(0) Integer limit,
-            @RequestParam(defaultValue = "0") @Min(0) Integer offset
-    ){
+            @RequestParam(defaultValue = "0") @Min(0) Integer offset){
         // 從 Token 解析出 userId
         Integer userId = jwtUtil.getUserIdFromToken();
 

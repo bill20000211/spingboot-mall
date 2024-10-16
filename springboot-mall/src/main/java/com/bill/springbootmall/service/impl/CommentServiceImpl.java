@@ -1,6 +1,7 @@
 package com.bill.springbootmall.service.impl;
 
 import com.bill.springbootmall.dao.CommentDao;
+import com.bill.springbootmall.dto.CommentQueryParams;
 import com.bill.springbootmall.dto.CreateCommentRequest;
 import com.bill.springbootmall.model.Comment;
 import com.bill.springbootmall.service.CommentService;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @Component
 public class CommentServiceImpl implements CommentService {
@@ -36,5 +39,17 @@ public class CommentServiceImpl implements CommentService {
     public Comment getCommentById(Integer commentId) {
         Comment comment = commentDao.getCommentById(commentId);
         return comment;
+    }
+
+    @Override
+    public List<Comment> getComments(CommentQueryParams commentQueryParams) {
+        List<Comment> commentList = commentDao.getComments(commentQueryParams);
+        return commentList;
+    }
+
+    @Override
+    public Integer countComments(CommentQueryParams commentQueryParams) {
+        Integer total = commentDao.countComments(commentQueryParams);
+        return total;
     }
 }

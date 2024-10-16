@@ -33,6 +33,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/products/*").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/products/*").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/users/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/products/*/comments").permitAll()
                         .anyRequest().authenticated()  // 其他所有請求都需要身份驗證
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)  // 添加 JWT 過濾器

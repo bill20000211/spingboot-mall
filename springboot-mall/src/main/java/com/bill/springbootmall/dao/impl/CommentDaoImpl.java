@@ -1,11 +1,11 @@
 package com.bill.springbootmall.dao.impl;
 
 import com.bill.springbootmall.dao.CommentDao;
+import com.bill.springbootmall.dto.CommentQueryParams;
 import com.bill.springbootmall.dto.CreateCommentRequest;
 import com.bill.springbootmall.model.Comment;
 import com.bill.springbootmall.rowmapper.CommentRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -74,5 +74,53 @@ public class CommentDaoImpl implements CommentDao {
         }else {
             return null;
         }
+    }
+
+    @Override
+    public List<Comment> getComments(CommentQueryParams commentQueryParams) {
+        String sql = "SELECT DISTINCT c.comment_id, c.order_id, c.score, c.content, c.created_date, c.last_modified_date" +
+                " FROM comment as c " +
+                "JOIN `order` as o ON c.order_id = o.order_id " +
+                "JOIN order_item as oi ON o.order_id = oi.order_id " +
+                "WHERE 1=1";
+
+        Map<String, Object> map = new HashMap<>();
+
+        sql = addFilteringSql(sql, map, commentQueryParams);
+
+        sql += " ORDER BY " + commentQueryParams.getOrderBy() +
+                " " + commentQueryParams.getSort();
+
+        sql += " LIMIT :limit OFFSET :offset";
+        map.put("limit", commentQueryParams.getLimit());
+        map.put("offset", commentQueryParams.getOffset());
+
+        List<Comment> commentList = namedParameterJdbcTemplate.query(sql, map, new CommentRowMapper());
+
+        return commentList;
+    }
+
+    @Override
+    public Integer countComments(CommentQueryParams commentQueryParams) {
+        String sql = "SELECT count(*) FROM comment as c " +
+                "JOIN `order` as o ON c.order_id = o.order_id " +
+                "JOIN order_item as oi ON o.order_id = oi.order_id " +
+                "WHERE 1=1";
+        Map<String, Object> map = new HashMap<>();
+
+        sql = addFilteringSql(sql, map, commentQueryParams);
+
+        Integer total = namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class);
+        return total;
+    }
+
+    private String addFilteringSql(String sql,
+                                   Map<String, Object> map,
+                                   CommentQueryParams commentQueryParams) {
+        if (commentQueryParams.getProductId() != null) {
+            sql += " AND oi.product_id = :productId";
+            map.put("productId", commentQueryParams.getProductId());
+        }
+        return sql;
     }
 }
